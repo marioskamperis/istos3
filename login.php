@@ -11,10 +11,12 @@
 	<div class="container">
 
 		<div class="login">
-			<form name="form" actions="login.php" method="POST" accept-charset="utf-8">
+			<form name="form" actions="login.php" method="POST" accept-charset="utf-8" autocomplete="off">
 				<input type="text" name='email' id='email' placeholder="example@email.com" required>
-				<input type="password" name='password' id='password' placeholder="password" required>
+				<input type="text" name='password' id='password' placeholder="password" required>
 				<input type="submit" value="Sign In">
+				<input type ="submit" onclick="location.href='register.php'" value="Register Now">
+				<input type ="submit" onclick="location.href='index.php'" value="List Of Movies">
 			</form>
 		</div>
 		<div class="shadow"></div>
@@ -49,6 +51,7 @@ if (isset($_POST['email']) && $_POST['email'] != '' && isset($_POST['password'])
 	$email = stripslashes($email);
 	$password = stripslashes($password);
 
+	
 
 	$user = $db->getUserByEmailAndPassword($email, $password);
 	if ( ! empty($user)) {

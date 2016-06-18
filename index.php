@@ -3,11 +3,17 @@
 require_once 'DB_Functions.php';
 $db = new DB_Functions();
 
-$array = $db->getGenres();
+$genres = $db->getGenres();
+$genre_lookup = array();
+foreach ($genres as $item) {
+	$genre_lookup[$item[0]] = $item[1];
+}
+unset($genre);
 
 session_start();
 $user = $_SESSION['user'];
-$is_logged=(!empty($user)?true:false);
+$is_logged = (! empty($user) ? true : false);
+
 //
 //echo __DIR__;
 //$file= "images/img1.jpg";
@@ -21,15 +27,9 @@ $is_logged=(!empty($user)?true:false);
 //exit;
 // login from browser
 //echo $_POST['genreSelect'];
-if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 
+if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 	$movies = $db->getMovies($_POST['genreSelect']);
-	//	var_dump($movies);
-	//	foreach ($movies as $item) {
-	//		foreach ($item as $inneritem) {
-	//			echo $inneritem . "\n";
-	//		}
-	//	}
 }
 
 ?>
@@ -40,15 +40,15 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 	<title>Title</title>
 	<link rel="stylesheet" type="text/css" href="css/index.css">
 	<script type="text/javascript">
-//		function logout{
-//			alert("logged out");
-//		}
-//		function login{
-//			alert("login out");
-//		}
-//		function register{
-//			alert("register out");
-//		}
+		//		function logout{
+		//			alert("logged out");
+		//		}
+		//		function login{
+		//			alert("login out");
+		//		}
+		//		function register{
+		//			alert("register out");
+		//		}
 	</script>
 </head>
 <body>
@@ -58,13 +58,13 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 
 	<div id="content">
 		<?php
-		if($is_logged){
-			echo'<button  id="logout" onclick="location.href=\'logout.php\'" name="logout">Logout</button>';
+		if ($is_logged) {
+			echo '<button  id="logout" onclick="location.href=\'logout.php\'" name="logout">Logout</button>';
 
-		}else{
+		} else {
 
-			echo'<button  id="login" onclick="location.href=\'login.php\'" name="login">Login</button>';
-			echo'<button  id="register" onclick="location.href=\'register.php\'" name="register">Register</button>';
+			echo '<button  id="login" onclick="location.href=\'login.php\'" name="login">Login</button>';
+			echo '<button  id="register" onclick="location.href=\'register.php\'" name="register">Register</button>';
 		}
 		?>
 
@@ -76,8 +76,8 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 			<select name="genreSelect" onchange="this.form.submit()">
 				<option value="0">All Genres</option>
 				<?php
-				foreach ($array as $item) {
-					echo '<option value="' . $item[0] . '">' . $item[1] . '</option>';
+				foreach ($genre_lookup as $key => $value) {
+					echo '<option value="' . $key . '">' . $value . '</option>';
 				}
 				?>
 			</select>
@@ -85,8 +85,9 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 		<div class="movies">
 			<?php
 
+
 			if (isset($movies) && ! empty($movies)) {
-				echo "<table style=\"width:100%\">";
+				echo "<table class = \"moviesTable\" style=\"width:100%\">";
 
 
 				echo "<tr>";
@@ -94,23 +95,31 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 				echo "<th>title</th>";
 				echo "<th>release_date</th>";
 				echo "<th>genre_id</th>";
-				echo "<th>image_id</th>";
 				echo "<th>summary</th>";
-				//		echo "</tr>";
-				//		foreach ($movies as $movie) {
-				//			foreach ($movie as $key => $value) {
-				//				echo "<th>" . $key . "</th>";
-				//			}
-				//		}
+				echo "<th>movie_rating</th>";
+				echo "<th>image_id</th>";
 				echo "</tr>";
-
 
 				foreach ($movies as $movie) {
 
-					echo "<tr>";
-					foreach ($movie as $key => $value) {
-						echo "<td>" . $value . "</td>";
-					}
+					echo "<tr id = " . $movie['id'] . " onclick=\"window.document.location='movie.php?movie_id=" . $movie['id'] . "';\">";
+//					foreach ($movie as $key => $value) {
+//						if ($key == 'genre_id') {
+//							$value = $genre_lookup[$value];
+//						}
+//						if (empty($value)) {
+//							$value = "Missing data";
+//						}
+//
+////						$value=($key=="movie_rating")?$value."/5":"0/5";
+						echo "<td>" . $movie['id'] . "</td>";
+						echo "<td>" . $movie['title'] . "</td>";
+						echo "<td>" . $movie['release_date'] . "</td>";
+						echo "<td>" . $genre_lookup[$movie['genre_id'] ]. "</td>";
+						echo "<td>" . $movie['summary'] . "</td>";
+						echo "<td>" . $movie['movie_rating'] . "/5</td>";
+						echo "<td>" . $movie['image_id'] . "</td>";
+//					}
 					echo "</tr>";
 				}
 

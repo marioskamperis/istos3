@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,10 +10,12 @@
 <div class="wrapper">
 	<div class="container">
 		<div class="login">
-			<form name="form" actions="register.php" method="POST" accept-charset="utf-8">
-				<input type="text" name='name' id='name' placeholder="name" required>
+			<form name="form" actions="register.php" method="POST" accept-charset="utf-8" autocomplete="off">
+
+				<input type="text" name='name' id='name' placeholder="FullName" required>
 				<input type="text" name='email' id='email' placeholder="example@email.com" required>
-				<input type="password" name='password' id='password' placeholder="password" required>
+				<!--				set password field as text to prevent autocompleye-->
+				<input type="text" name='password' id='password' placeholder="password" required>
 				<input type="submit" value="Register Now">
 			</form>
 		</div>
@@ -30,7 +30,6 @@
 // include db handler
 require_once 'DB_Functions.php';
 $db = new DB_Functions();
-
 /**
  * Registering a user device
  * Store reg id in users table
@@ -44,8 +43,14 @@ if (isset($_POST["name"]) && isset($_POST["password"]) && isset($_POST["email"])
 	$name = $_POST["name"];
 	$res = $db->storeUser($email, $password, $name);
 
-	var_dump($res);
-} else {
-	// user details missing
+//	var_dump($res);
+	$error = $res["error"];
+	$msg = $res["msg"];
+	if ($error == true) {
+		echo '<script> alert("'.$msg.'"); </script>';
+	} else {
+		header("Location: login.php");
+		die();
+	}
 }
 ?>

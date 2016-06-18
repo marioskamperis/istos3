@@ -30,35 +30,54 @@ class DB_Functions
 	 */
 	public function storeUser($email, $password, $name)
 	{
-		$uuid = uniqid('', true);
-		$hash = $this->hashSSHA($password);
-		$encrypted_password = $hash["encrypted"]; // encrypted password
+		$response = array(
+			'error' => true,
+			'msg' => "empty"
+		);
+		$result = mysqli_query($this->con, "SELECT * FROM users WHERE email='$email'");
 
-		$salt = $hash["salt"]; // salt
-		$sql="INSERT INTO users(unique_id, name, email, encrypted_password, salt, created_at) VALUES('$uuid', '$name', '$email', '$encrypted_password', '$salt', NOW());";
 
-		$result = mysqli_query($this->con,$sql);
-		// check for successful store
-		if ($result) {
-			// get user details
-			$id = mysqli_insert_id(); // last inserted id
-			$result = mysqli_query($this->con,"SELECT * FROM users WHERE id = $id");
-			// return user details
-			return mysqli_fetch_array($result);
-		} else {
-			return false;
+		if (mysqli_num_rows($result) == 0) {
+
+			$uuid = uniqid('', true);
+			$hash = $this->hashSSHA($password);
+			$encrypted_password = $hash["encrypted"]; // encrypted password
+
+			$salt = $hash["salt"]; // salt
+			$sql = "INSERT INTO users(unique_id, name, email, encrypted_password, salt, created_at) VALUES('$uuid', '$name', '$email', '$encrypted_password', '$salt', NOW());";
+
+			$result = mysqli_query($this->con, $sql);
+			// check for successful store
+			if ($result) {
+				// get user details
+				$id = mysqli_insert_id($this->con); // last inserted id
+
+				$result = mysqli_query($this->con, 'SELECT * FROM istos3.users WHERE id = ' . $id . ' ;');
+
+				// return user details
+				$response['error'] = false;
+				$response['msg'] = $result;
+				return $response;
+			} else {
+				$response['error'] = true;
+				$response['msg'] = "User could not be stored";
+				return $response;
+			}
 		}
+		$response['error'] = true;
+		$response['msg'] = "User already exists";
+		return $response;
 	}
 
 	public function loginUser($user_id, $ip, $browser)
 	{
 
-		$result = mysqli_query($this->con,"INSERT INTO user_info(login_at,loggout_at,user_id,heartbeat,ip_adress,is_alive,browser)
+		$result = mysqli_query($this->con, "INSERT INTO user_info(login_at,loggout_at,user_id,heartbeat,ip_adress,is_alive,browser)
                               VALUES(NOW(),NULL,$user_id,NOW(),'$ip',NOW(),'$browser')");
 
 
 		$id = mysqli_insert_id();; // Initializing Session
-		$user = mysqli_query($this->con,"SELECT * FROM user_info WHERE id = $id");
+		$user = mysqli_query($this->con, "SELECT * FROM user_info WHERE id = $id");
 
 		// check for successful store
 		if ( ! empty($user)) {
@@ -70,7 +89,8 @@ class DB_Functions
 
 	public function isAlive($user_id, $ip, $browser)
 	{
-		$result = mysqli_query($this->con,"INSERT INTO user_info(login_at,loggout_at,user_id,ip_adress,) VALUES(NOW(),NULL,$user_id,$ip,$browsero)");
+		$result = mysqli_query($this->con,
+			"INSERT INTO user_info(login_at,loggout_at,user_id,ip_adress,) VALUES(NOW(),NULL,$user_id,$ip,$browsero)");
 		$_SESSION['logid'] = mysqli_insert_id();; // Initializing Session
 
 		// check for successful store
@@ -84,23 +104,12 @@ class DB_Functions
 	public function logoutUser($id)
 	{
 		$id = $_SESSION['user_info']['id'];
-		$ok = mysqli_query($this->con,"UPDATE user_info SET loggout_at = NOW() WHERE id = $id;");
+		$ok = mysqli_query($this->con, "UPDATE user_info SET loggout_at = NOW() WHERE id = $id;");
 
-		$result = mysqli_query($this->con,"SELECT loggout_at FROM user_info
+		$result = mysqli_query($this->con, "SELECT loggout_at FROM user_info
                         WHERE $id=$id
                         ORDER BY loggout_at DESC
                         LIMIT 1;");
-		// // check for successful store
-
-		// echo($id);
-
-		// $smt=mysqli_fetch_array($result);
-		// echo(print_r($smt,true));
-		// echo(" doihduo".$smt['loggout_at']);
-
-		// //$_SESSION['user_info']['loggout_at']=mysqli_fetch_array($result['loggout_at']);
-		// //echo($_SESSION['user_info']['loggout_at']);
-		//die();
 		if ( ! empty($smt)) {
 			return $smt['loggout_at'];
 		} else {
@@ -110,14 +119,14 @@ class DB_Functions
 
 	public function getUsers()
 	{
-		$all_users = mysqli_query($this->con,"SELECT * FROM users");
+		$all_users = mysqli_query($this->con, "SELECT * FROM users");
 		return mysqli_fetch_array($all_users);
 
 	}
 
 	public function getUserInfo($id)
 	{
-		$user_info = mysqli_query($this->con,"SELECT * FROM user_info WHERE user_id='$id'");
+		$user_info = mysqli_query($this->con, "SELECT * FROM user_info WHERE user_id='$id'");
 		$return = mysqli_fetch_array($user_info);
 
 	}
@@ -132,6 +141,7 @@ class DB_Functions
 
 
 		$result = mysqli_query($this->con, $query);
+//		var_dump($result);
 		if (mysqli_connect_errno()) {
 			echo "Failed to connect to MySQL: " . mysqli_connect_error();
 		}
@@ -232,14 +242,116 @@ class DB_Functions
 		}
 	}
 
+	function getMovie($movie_id)
+	{
+
+		if (empty($movie_id) || ! intval($movie_id)) {
+			return false;
+		}
+
+		$query = "SELECT * FROM movies WHERE id='$movie_id' ; ";
+
+		$result = mysqli_query($this->con, $query);
+		if (mysqli_connect_errno()) {
+			echo "Failed to connect to MySQL: " . mysqli_connect_error();
+		}
+
+		$result = mysqli_fetch_assoc($result);
+
+		if ( ! empty($result)) {
+			// user authentication details are correct
+			return $result;
+		} else {
+			return false;
+		}
+
+	}
+	function getUserRating($user_id , $movie_id)
+	{
+
+		if (empty($user_id) || empty($movie_id)) {
+			return false;
+		}
+		if (!intval($user_id) || !intval($movie_id)) {
+			return false;
+		}
+
+		$query = "SELECT rating FROM user_ratings WHERE user_id='$user_id' AND movie_id = '$movie_id' ; ";
+
+		$result = mysqli_query($this->con, $query);
+		if (mysqli_connect_errno()) {
+			echo "Failed to connect to MySQL: " . mysqli_connect_error();
+		}
+
+		$result = mysqli_fetch_assoc($result);
+
+		if ( ! empty($result)) {
+			// user authentication details are correct
+			return $result;
+		} else {
+			return false;
+		}
+
+	}
+	function getMovieRating( $movie_id)
+	{
+
+		if (empty($movie_id) || !intval($movie_id)) {
+			return false;
+		}
+
+		$query = "SELECT AVG(rating) as average FROM istos3.user_ratings WHERE  movie_id = '$movie_id';";
+
+		$result = mysqli_query($this->con, $query);
+		if (mysqli_connect_errno()) {
+			echo "Failed to connect to MySQL: " . mysqli_connect_error();
+		}
+
+		$result = mysqli_fetch_assoc($result);
+
+		if ( ! empty($result)) {
+			// user authentication details are correct
+			return $result;
+		} else {
+			return false;
+		}
+
+	}
+
+	function getNumberofVoters($movie_id)
+	{
+
+		if (empty($movie_id) || !intval($movie_id)) {
+			return false;
+		}
+
+		$query = "SELECT COUNT(DISTINCT user_id) as voters FROM istos3.user_ratings WHERE  movie_id = '$movie_id';";
+
+		$result = mysqli_query($this->con, $query);
+
+		if (mysqli_connect_errno()) {
+			echo "Failed to connect to MySQL: " . mysqli_connect_error();
+		}
+
+		$result = mysqli_fetch_assoc($result);
+
+		if ( ! empty($result)) {
+			// user authentication details are correct
+			return $result;
+		} else {
+			return false;
+		}
+
+	}
+
 	function storeImage($image, $movie_id)
 	{
 
-//		$image = mysqli_real_escape_string($image);
+		//		$image = mysqli_real_escape_string($image);
 		echo $image;
 		$sql = "UPDATE istos3.movies SET image = '$image' WHERE id = '$movie_id' ; ";
 
-		mysqli_query($this->con,$sql);
+		mysqli_query($this->con, $sql);
 
 	}
 
