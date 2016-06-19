@@ -16,6 +16,10 @@ class DB_Functions
 		$this->db = new DB_Connect();
 		$this->con = $this->db->connect();
 
+
+		//		echo "	<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\"
+		//		  integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\">";
+
 	}
 
 	// destructor
@@ -23,6 +27,7 @@ class DB_Functions
 	{
 
 	}
+
 
 	/**
 	 * Storing new user
@@ -101,6 +106,7 @@ class DB_Functions
 		}
 	}
 
+
 	public function logoutUser($id)
 	{
 		$id = $_SESSION['user_info']['id'];
@@ -141,7 +147,7 @@ class DB_Functions
 
 
 		$result = mysqli_query($this->con, $query);
-//		var_dump($result);
+		//		var_dump($result);
 		if (mysqli_connect_errno()) {
 			echo "Failed to connect to MySQL: " . mysqli_connect_error();
 		}
@@ -266,13 +272,35 @@ class DB_Functions
 		}
 
 	}
-	function getUserRating($user_id , $movie_id)
+
+	function vote($user_id, $movie_id, $vote)
+	{
+		$user_rating = $this->getUserRating($user_id, $movie_id);
+		if ($user_rating == false) {
+
+			$sql = "INSERT INTO istos3.user_ratings(user_id,movie_id,rating) VALUES( " . $user_id . " , " . $movie_id . " , " . $vote . ") ;";
+
+
+		} else {
+			$sql = "UPDATE istos3.user_ratings SET rating = " . $vote . " WHERE user_id=" . $user_id . " AND movie_id=" . $movie_id . ";  ";
+			$id = $_SESSION['user_info']['id'];
+			$ok = mysqli_query($this->con, "");
+
+		}
+		$result = mysqli_query($this->con, $sql);
+
+		return $result;
+
+
+	}
+
+	public function getUserRating($user_id, $movie_id)
 	{
 
 		if (empty($user_id) || empty($movie_id)) {
 			return false;
 		}
-		if (!intval($user_id) || !intval($movie_id)) {
+		if ( ! intval($user_id) || ! intval($movie_id)) {
 			return false;
 		}
 
@@ -291,12 +319,13 @@ class DB_Functions
 		} else {
 			return false;
 		}
-
 	}
-	function getMovieRating( $movie_id)
+
+
+	function getMovieRating($movie_id)
 	{
 
-		if (empty($movie_id) || !intval($movie_id)) {
+		if (empty($movie_id) || ! intval($movie_id)) {
 			return false;
 		}
 
@@ -321,7 +350,7 @@ class DB_Functions
 	function getNumberofVoters($movie_id)
 	{
 
-		if (empty($movie_id) || !intval($movie_id)) {
+		if (empty($movie_id) || ! intval($movie_id)) {
 			return false;
 		}
 

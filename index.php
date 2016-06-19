@@ -38,97 +38,95 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 <head>
 	<meta charset="UTF-8">
 	<title>Title</title>
-	<link rel="stylesheet" type="text/css" href="css/index.css">
-	<script type="text/javascript">
-		//		function logout{
-		//			alert("logged out");
-		//		}
-		//		function login{
-		//			alert("login out");
-		//		}
-		//		function register{
-		//			alert("register out");
-		//		}
-	</script>
+	<!--	<link rel="stylesheet" type="text/css" href="css/index.css">-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+		  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
 </head>
 <body>
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="index.php">AssoeMDB</a>
+		</div>
+		<ul class="nav navbar-nav">
+			<li class="active"><a href="index.php">Movies</a></li>
+			<?php
+			if ($is_logged) {
+				echo '<li><a href="logout.php">Logout</a></li>';
+
+			} else {
+
+				echo '<li><a href="login.php">Login</a></li>';
+				echo '<li><a href="register.php">Register</a></li>';
+			}
+			?>
+		</ul>
+	</div>
+</nav>
 
 
 <div class="parent">
 
-	<div id="content">
-		<?php
-		if ($is_logged) {
-			echo '<button  id="logout" onclick="location.href=\'logout.php\'" name="logout">Logout</button>';
-
-		} else {
-
-			echo '<button  id="login" onclick="location.href=\'login.php\'" name="login">Login</button>';
-			echo '<button  id="register" onclick="location.href=\'register.php\'" name="register">Register</button>';
-		}
-		?>
+	<div class="row">
+		<div class="col-md-4"></div>
+		<div class="col-md-4">
+			<form action="index.php" method="POST">
+				<select class="form-control" name="genreSelect" onchange="this.form.submit()">
+					<option value="0">All Genres</option>
+					<?php
+					foreach ($genre_lookup as $key => $value) {
+						echo '<option value="' . $key . '">' . $value . '</option>';
+					}
+					?>
+				</select>
+			</form>
+		</div>
+		<div class="col-md-4"></div>
 
 	</div>
-
-
-	<div class="bottom" id="bottom">
-		<form action="index.php" method="POST">
-			<select name="genreSelect" onchange="this.form.submit()">
-				<option value="0">All Genres</option>
+	<div class="row">
+		<div class="col-md-1"></div>
+		<div class="col-md-10">
+			<table class="table table-striped table-hover">
 				<?php
-				foreach ($genre_lookup as $key => $value) {
-					echo '<option value="' . $key . '">' . $value . '</option>';
+
+
+				if (isset($movies) && ! empty($movies)) {
+
+
+					echo "<tr>";
+					echo "<th>id</th>";
+					echo "<th>title</th>";
+					echo "<th>release_date</th>";
+					echo "<th>genre_id</th>";
+					echo "<th>summary</th>";
+					echo "<th>movie_rating</th>";
+					echo "<th>image_id</th>";
+					echo "</tr>";
+
+					foreach ($movies as $movie) {
+
+						echo "<tr id = " . $movie['id'] . " onclick=\"window.document.location='movie.php?movie_id=" . $movie['id'] . "';\">";
+						echo "<td>" . $movie['id'] . "</td>";
+						echo "<td><a href='movie.php?movie_id=" . $movie['id'] . "'> " . $movie['title'] . "</a></td>";
+						echo "<td>" . $movie['release_date'] . "</td>";
+						echo "<td>" . $genre_lookup[$movie['genre_id']] . "</td>";
+						echo "<td>" . $movie['summary'] . "</td>";
+						echo "<td>" . (empty($movie['movie_rating'])?0:$movie['movie_rating']) . "/5</td>";
+						echo "<td>" . $movie['image_id'] . "</td>";
+						echo "</tr>";
+					}
+
+
 				}
 				?>
-			</select>
-		</form>
-		<div class="movies">
-			<?php
-
-
-			if (isset($movies) && ! empty($movies)) {
-				echo "<table class = \"moviesTable\" style=\"width:100%\">";
-
-
-				echo "<tr>";
-				echo "<th>id</th>";
-				echo "<th>title</th>";
-				echo "<th>release_date</th>";
-				echo "<th>genre_id</th>";
-				echo "<th>summary</th>";
-				echo "<th>movie_rating</th>";
-				echo "<th>image_id</th>";
-				echo "</tr>";
-
-				foreach ($movies as $movie) {
-
-					echo "<tr id = " . $movie['id'] . " onclick=\"window.document.location='movie.php?movie_id=" . $movie['id'] . "';\">";
-//					foreach ($movie as $key => $value) {
-//						if ($key == 'genre_id') {
-//							$value = $genre_lookup[$value];
-//						}
-//						if (empty($value)) {
-//							$value = "Missing data";
-//						}
-//
-////						$value=($key=="movie_rating")?$value."/5":"0/5";
-						echo "<td>" . $movie['id'] . "</td>";
-						echo "<td>" . $movie['title'] . "</td>";
-						echo "<td>" . $movie['release_date'] . "</td>";
-						echo "<td>" . $genre_lookup[$movie['genre_id'] ]. "</td>";
-						echo "<td>" . $movie['summary'] . "</td>";
-						echo "<td>" . $movie['movie_rating'] . "/5</td>";
-						echo "<td>" . $movie['image_id'] . "</td>";
-//					}
-					echo "</tr>";
-				}
-
-
-				echo "</table>";
-			}
-			?>
+			</table>
 		</div>
+		<div class="col-md-1"></div>
+
 	</div>
+</div>
 </div>
 
 </body>
