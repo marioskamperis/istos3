@@ -14,22 +14,50 @@ session_start();
 $user = $_SESSION['user'];
 $is_logged = (! empty($user) ? true : false);
 
-//
-//echo __DIR__;
-//$file= "images/img1.jpg";
-//$img= file_get_contents($file);
-//$size = getimagesize($img);
-//echo $img;
-//echo $size;
-//
-//$db->storeImage($img,1);
-//
-//exit;
-// login from browser
-//echo $_POST['genreSelect'];
-
 if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 	$movies = $db->getMovies($_POST['genreSelect']);
+
+}else{
+	$movies= $db->getMovies(0);
+}
+
+
+function make_comparer() {
+	// Normalize criteria up front so that the comparer finds everything tidy
+	$criteria = func_get_args();
+	foreach ($criteria as $index => $criterion) {
+		$criteria[$index] = is_array($criterion)
+			? array_pad($criterion, 3, null)
+			: array($criterion, SORT_ASC, null);
+	}
+
+	return function($first, $second) use ($criteria) {
+		foreach ($criteria as $criterion) {
+			// How will we compare this round?
+			list($column, $sortOrder, $projection) = $criterion;
+			$sortOrder = $sortOrder === SORT_DESC ? -1 : 1;
+
+			// If a projection was defined project the values now
+			if ($projection) {
+				$lhs = call_user_func($projection, $first[$column]);
+				$rhs = call_user_func($projection, $second[$column]);
+			}
+			else {
+				$lhs = $first[$column];
+				$rhs = $second[$column];
+			}
+
+			// Do the actual comparison; do not return if equal
+			if ($lhs < $rhs) {
+				return -1 * $sortOrder;
+			}
+			else if ($lhs > $rhs) {
+				return 1 * $sortOrder;
+			}
+		}
+
+		return 0; // tiebreakers exhausted, so $first == $second
+	};
 }
 
 ?>
@@ -41,9 +69,10 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 	<!--	<link rel="stylesheet" type="text/css" href="css/index.css">-->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 		  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
 
 </head>
-<body>
+<body style="overflow: scroll;">
 <nav class="navbar navbar-default">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -94,16 +123,37 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 
 				if (isset($movies) && ! empty($movies)) {
 
+					$actual_link = "$_SERVER[REQUEST_URI]";
+					$url="";
+
+					if (preg_match("/order/",$actual_link)) {
+						if(preg_match("/desc/",$actual_link)){
+							usort($movies, make_comparer(['movie_rating', SORT_DESC]));
+							$url="index.php?order=asc";
+
+							$order_icon="<i class=\"fa fa-long-arrow-up\" aria-hidden=\"true\"></i>";
+
+						}else{
+							usort($movies, make_comparer(['movie_rating', SORT_ASC]));
+							$url="index.php?order=desc";
+							$order_icon="<i class=\"fa fa-long-arrow-down\" aria-hidden=\"true\"></i>";
+						}
+					}else{
+						$url="index.php?order=asc";
+					}
+
 
 					echo "<tr>";
-					echo "<th>id</th>";
-					echo "<th>title</th>";
-					echo "<th>release_date</th>";
-					echo "<th>genre_id</th>";
-					echo "<th>summary</th>";
-					echo "<th>movie_rating</th>";
-					echo "<th>image_id</th>";
+					echo "<th><a href ='index.php'>Movie ID</a></th>";
+					echo "<th>Movie Title</th>";
+					echo "<th>Release Date</th>";
+					echo "<th>Genre</th>";
+					echo "<th>Summary</th>";
+					echo "<th><a href ='".$url."'>Rating</a>".$order_icon."</th>";
+					echo "<th>Image</th>";
 					echo "</tr>";
+
+
 
 					foreach ($movies as $movie) {
 
@@ -114,7 +164,8 @@ if (isset($_POST['genreSelect']) && $_POST['genreSelect'] != '') {
 						echo "<td>" . $genre_lookup[$movie['genre_id']] . "</td>";
 						echo "<td>" . $movie['summary'] . "</td>";
 						echo "<td>" . (empty($movie['movie_rating'])?0:$movie['movie_rating']) . "/5</td>";
-						echo "<td>" . $movie['image_id'] . "</td>";
+						echo '<td><img class ="img-thumbnail" style src="data:image/jpeg;base64,'.base64_encode( $movie['image'] ).'"/></td>';
+
 						echo "</tr>";
 					}
 

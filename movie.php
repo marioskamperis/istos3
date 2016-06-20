@@ -3,9 +3,15 @@
 
 if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 
+
+
+
 	require_once 'DB_Functions.php';
 	$db = new DB_Functions();
 
+//	$ok= $db->vote(1, 1 ,2);
+//	echo $ok;
+//	exit;
 	session_start();
 
 	//Lookup Table for genres
@@ -27,20 +33,18 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 	if (isset($_SESSION['user']) && ! empty($_SESSION['user'])) {
 		$user = $_SESSION['user'];
 		$is_logged = true;
+		echo "<script>var is_logged=true;</script>";
 		//		var_dump($user['id']);
 		$user_rating = $db->getUserRating($user['id'], $movie_id);
 		$user_rating = $user_rating['rating'];
-
 		$numberOfVoters = $db->getNumberofVoters($movie_id);
-
 		$numberOfVoters = $numberOfVoters['voters'];
 	} else {
 		$is_logged = false;
+		echo "<script>var is_logged=false;</script>";
 		$movie_rating = $db->getMovieRating($movie_id);
 		$movie_rating = $movie_rating['average'];
-
 		$numberOfVoters = $db->getNumberofVoters($movie_id);
-
 		$numberOfVoters = $numberOfVoters['voters'];
 	}
 	//Decide Data to show user
@@ -59,10 +63,9 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 	<link rel="stylesheet" type="text/css" href="css/movie.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 		  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
 </head>
-<body>
+<body style="overflow: scroll;">
 <nav class="navbar navbar-default">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -87,7 +90,8 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 
 	<div class="row">
 		<div class="col-md-4"></div>
-		<div class="col-md-4"><img style="text-align: center;" src="images/img1.jpg" id="profile_pic"/></div>
+		<div
+			class="col-md-4"><?php echo '<td><img class ="img-thumbnail" style src="data:image/jpeg;base64,' . base64_encode($movie['image']) . '"/></td>'; ?></div>
 		<div class="col-md-4"></div>
 	</div>
 
@@ -128,7 +132,7 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 					}
 					?>
 				</span></div>
-		<div class="col-md-2"><span id = "rating">
+		<div class="col-md-1"><span id="rating">
 					<?php
 					if ($is_logged) {
 						if (empty($user_rating) || $user_rating == false) {
@@ -137,10 +141,11 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 							echo round($user_rating, 2) . " out of 5 stars";
 						}
 					} else {
-						echo round($movie_rating, 2) . " out of 5 stars";
+						echo round($movie_rating, 2) . " out of 5 stars ";
 					}
 					?>
 				</span></div>
+		<div class="col-md-1"><span class="value" id="voters"><?php echo $numberOfVoters." Voters"; ?></span></div>
 		<div class="col-md-4"></div>
 	</div>
 	<div class="row">
@@ -159,17 +164,20 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 								<input class=\"star star-1\" id=\"star-1\" type=\"radio\" name=\"star\"/>
 								<label class=\"star star-1\" for=\"star-1\"></label>
 							  </form></div>";
-					
+
 					if ($is_logged) {
 						echo $stars;
 						$user_rating = intval($user_rating);
+
 						if ($user_rating != 0) {
+							echo "<script>var rating=".$user_rating.";</script>";
 							echo "<script> document.getElementById(\"star-" . $user_rating . "\").checked=true;</script>";
 						}
 					} else {
 						echo $stars;
 						$movie_rating = intval($movie_rating);
 						if ($movie_rating != 0) {
+							echo "<script>var rating=".$movie_rating.";</script>";
 							echo "<script>document.getElementById(\"star-" . $movie_rating . "\").checked=true;</script>";
 						}
 
@@ -180,12 +188,12 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 				</span></div>
 		<div class="col-md-4"></div>
 	</div>
-	<div class="row">
-		<div class="col-md-4"></div>
-		<div class="col-md-2"><span>Number Of Voters</span></div>
-		<div class="col-md-2"><span class="value"><?php echo $numberOfVoters; ?></span></div>
-		<div class="col-md-4"></div>
-	</div>
+<!--	<div class="row">-->
+<!--		<div class="col-md-4"></div>-->
+<!--		<div class="col-md-2"><span>Number Of Voters</span></div>-->
+<!--		<div class="col-md-2"><span class="value" id="voters">--><?php //echo $numberOfVoters; ?><!--</span></div>-->
+<!--		<div class="col-md-4"></div>-->
+<!--	</div>-->
 </div>
 
 </body>
@@ -194,14 +202,20 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 	function getVote()
 	{
 		var els = document.getElementsByClassName("star");
-
 		Array.prototype.forEach.call(els, function (el)
 		{
 			// Do stuff here
 			if (el.checked == true) {
 				var vote = el.id;
 				vote = vote.substr(vote.length - 1);
-				loadDoc(vote);
+				if (is_logged == false) {
+					alert("You must login to vote.");
+					document.getElementById("star-"+vote).checked=false;
+					return;
+				}else{
+					loadDoc(vote);
+				}
+
 			}
 
 		});
@@ -219,16 +233,22 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 				var response = JSON.parse(xhttp.responseText);
 
 
-				if (response.error==false) {
+				if (response.error == false) {
 					alert("Your Voting was submitted successfully");
-					document.getElementById("rating").innerHTML=vote+" out of 5 stars";
-				}else{
+					document.getElementById("rating").innerHTML = vote + " out of 5 stars";
+
+//					var voters = document.getElementById("voters").innerHTML;
+//					voters= parseInt(voters);
+//					voters++;
+//					document.getElementById("voters").innerHTML = voters;
+
+				} else {
 					alert("Something went wrong during voting. Please try again later.");
 				}
 
 			}
 		};
-		var postvars = "user_id=" + <?php echo $user['id'];?> + "&movie_id=" + <?php echo $movie_id;?> + "&vote=" + vote;
+		var postvars = "user_id=" + <?php echo $user['id'];?> +"&movie_id=" + <?php echo $movie_id;?> +"&vote=" + vote;
 
 
 		xhttp.open("POST", "voting.php", true);

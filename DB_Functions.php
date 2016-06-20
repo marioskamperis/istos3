@@ -209,9 +209,6 @@ class DB_Functions
 	function getMovies($genre_id)
 	{
 
-		if (empty($genre_id)) {
-			return false;
-		}
 
 		if ($genre_id == 0) {
 			$query = "SELECT * FROM movies ;";
@@ -275,24 +272,52 @@ class DB_Functions
 
 	function vote($user_id, $movie_id, $vote)
 	{
+		//Update user_rating for this movie.
 		$user_rating = $this->getUserRating($user_id, $movie_id);
 		if ($user_rating == false) {
-
 			$sql = "INSERT INTO istos3.user_ratings(user_id,movie_id,rating) VALUES( " . $user_id . " , " . $movie_id . " , " . $vote . ") ;";
-
-
 		} else {
+
 			$sql = "UPDATE istos3.user_ratings SET rating = " . $vote . " WHERE user_id=" . $user_id . " AND movie_id=" . $movie_id . ";  ";
 			$id = $_SESSION['user_info']['id'];
 			$ok = mysqli_query($this->con, "");
 
 		}
-		$result = mysqli_query($this->con, $sql);
+		$result_rating = mysqli_query($this->con, $sql);
 
-		return $result;
+		//Update user_rating for this movie.
+		if ( ! $result_rating) {
+			return false;
+		}
+
+
+		//Update movie rating
+		//Get current rating
+		$query = mysqli_query($this->con, "SELECT movie_rating as rating FROM istos3.movies WHERE  id = $movie_id ;");
+		if (mysqli_connect_errno()) {
+			echo "Failed to connect to MySQL: " . mysqli_connect_error();
+		}
+		$current_rating = mysqli_fetch_array($query);
+
+
+		if ($current_rating['rating'] == 0) {
+			$movie_rating = $vote;
+		} else {
+			$movie_rating = ($vote + $current_rating['rating']) / 2;
+		}
+
+		$result_rating = mysqli_query($this->con,
+			" UPDATE istos3.movies SET movie_rating = " . $movie_rating . " WHERE  id= " . $movie_id . " ;");
+		//Update movie rating
+		if ( ! $result_rating) {
+			return false;
+		}
+
+		return true;
 
 
 	}
+
 
 	public function getUserRating($user_id, $movie_id)
 	{
@@ -373,16 +398,6 @@ class DB_Functions
 
 	}
 
-	function storeImage($image, $movie_id)
-	{
-
-		//		$image = mysqli_real_escape_string($image);
-		echo $image;
-		$sql = "UPDATE istos3.movies SET image = '$image' WHERE id = '$movie_id' ; ";
-
-		mysqli_query($this->con, $sql);
-
-	}
 
 	/**
 	 * Check user is existed or not
