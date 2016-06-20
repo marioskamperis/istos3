@@ -15,7 +15,7 @@
 				<input type="text" name='email' id='email' placeholder="example@email.com" required>
 				<input type="text" name='password' id='password' placeholder="password" required>
 				<input type="submit" value="Sign In">
-				<input type ="submit" onclick="location.href='register.php'" value="Register Now">
+				<input class="btn btn-primary" type ="submit" onclick="location.href='register.php'" value="Register Now">
 				<input type ="submit" onclick="location.href='index.php'" value="List Of Movies">
 			</form>
 		</div>

@@ -163,7 +163,7 @@ function make_comparer() {
 						echo "<td>" . $movie['release_date'] . "</td>";
 						echo "<td>" . $genre_lookup[$movie['genre_id']] . "</td>";
 						echo "<td>" . $movie['summary'] . "</td>";
-						echo "<td>" . (empty($movie['movie_rating'])?0:$movie['movie_rating']) . "/5</td>";
+						echo "<td>" . (empty($movie['movie_rating'])?0:round($movie['movie_rating'],2)) . "/5</td>";
 						echo '<td><img class ="img-thumbnail" style src="data:image/jpeg;base64,'.base64_encode( $movie['image'] ).'"/></td>';
 
 						echo "</tr>";
