@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+
+$finishTime = time();
+$time = round(microtime(true) - $_SESSION["startTime"], 2);
+
+//echo $_SESSION['startTime'];
+//echo $_SESSION['correct_answers'];
+session_destroy();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,13 +32,28 @@
 		</ul>
 	</div>
 </nav>
-<div class="row"></div>
+<div class="row">
+
+	<div class="col-md-2"></div>
+	<div class="col-md-2">Your Time was :</div>
+	<div class="col-md-2">
+		<h4><b><?php echo $time; ?>seconds</b></h4>
+
+	</div>
+	<div class="col-md-2"></div>
+</div>
+<div class="row">
+	<div class="col-md-2"></div>
+	<div class="col-md-2">Your Score is :</div>
+	<div class="col-md-2"><h4><b><?php echo $_SESSION['correct_answers']; ?> correct answers Out of 6</b></h4></div>
+	<div class="col-md-2"></div>
+</div>
 <div class="row">
 	<div class="col-md-4"></div>
 	<div class="col-md-4">
 		<form action="index.php" method="post">
 			<input type="text" name="start" value="true" hidden><br>
-			<input onclick="start()" type="submit" value="START THE QUIZ" id="button" class="btn btn-primary"/>
+			<input onclick="start()" type="submit" value="START THE QUIZ AGAIN" id="button" class="btn btn-primary"/>
 		</form>
 	</div>
 	<div class="col-md-4"></div>
@@ -41,26 +68,3 @@
 		window.location.href = "index.php?start=true"
 	}
 </script>
-<?php
-/**
- * Created by PhpStorm.
- * User: Marios
- * Date: 6/20/2016
- * Time: 8:20 PM
- */
-if (isset($_POST['start']) && ! empty($_POST['start'])) {
-	include_once ("DB_Functions.php");
-	$db= new DB_Functions();
-
-	session_start();
-	$_SESSION['startTime']=microtime(true);
-	$_SESSION['no_of_question']=0;
-	$_SESSION['correct_answers']=0;
-	$questions=$db->getQuestions();
-	var_dump($questions);
-
-	$_SESSION['questions']=$questions;
-	header("Location: quiz.php");
-	
-}
-?>

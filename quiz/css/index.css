@@ -42,8 +42,8 @@ body {
 	font-family: "Arial Rounded MT Bold";
 	font-size: x-large;
 	background-color: beige;
-	/*overflow: hidden;*/
-	overflow:scroll;
+	/*!*overflow: hidden;*!*/
+	/*overflow:scroll;*/
 }
 
 div {

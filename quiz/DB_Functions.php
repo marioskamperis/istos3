@@ -43,13 +43,16 @@ class DB_Functions
 	public function getQuestions()
 	{
 
-		$sql = "SELECT * FROM istos3.quiz ORDER BY RAND() LIMIT 10";
+		$sql = "SELECT * FROM istos3.quiz ORDER BY RAND() LIMIT 6";
 		$result = mysqli_query($this->con, $sql);
 
-		$result = mysqli_fetch_all($result);
-		if ( ! empty($result)) {
 
-			return $result;
+		while ($row = mysqli_fetch_assoc($result)) {
+			$question_array[] = $row;
+		}
+		
+		if ( ! empty($question_array)) {
+			return $question_array;
 		} else {
 			return false;
 		}
