@@ -2,49 +2,35 @@
 <project version="4">
   <component name="PublishConfigData">
     <serverData>
-      <paths name="Dev Marine">
+      <paths name="MT Dev">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="Kontakiotis Local">
+      <paths name="Raspberry Pi Marios">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="Protereotitapp Local">
+      <paths name="admin_lte">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="Proterotitapp Local">
+      <paths name="crowdsourcing.marinetraffic.com">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
-      <paths name="Raspberry">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="Raspberry Testing Local">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="Trunk">
+      <paths name="cvas.marinetraffic.com">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
@@ -58,14 +44,7 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="http://crowdsourcing.marinetraffic.com">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="http://cvas.marinetraffic.com">
+      <paths name="map_old_pos">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
@@ -129,6 +108,13 @@
         </serverdata>
       </paths>
       <paths name="stage.marinetraffic.com">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="trunk.marinetraffic.com">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />

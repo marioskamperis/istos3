@@ -79,7 +79,9 @@ function make_comparer() {
 			<a class="navbar-brand" href="index.php">AssoeMDB</a>
 		</div>
 		<ul class="nav navbar-nav">
-			<li class="active"><a href="index.php">Movies</a></li>
+			<li><a href="../index.php">Home</a></li>
+			<li class="active"><a href="../movies/index.php">AsoeeMDB</a></li>
+			<li><a href="../quiz/index.php">Quiz</a></li>
 			<?php
 			if ($is_logged) {
 				echo '<li><a href="logout.php">Logout</a></li>';

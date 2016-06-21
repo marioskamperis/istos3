@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>AsoeeMDB</title>
+	<title>AsoeeQUIZ</title>
 	<link rel="stylesheet" type="text/css" href="css/index.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
 		  integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -16,7 +16,9 @@
 			<a class="navbar-brand" href="index.php">Quiz</a>
 		</div>
 		<ul class="nav navbar-nav">
-			<li class="active"><a href="index.php">Home</a></li>
+			<li><a href="../index.php">Home</a></li>
+			<li><a href="../movies/index.php">AsoeeMDB</a></li>
+			<li class="active"><a href="../quiz/index.php">Quiz</a></li>
 		</ul>
 	</div>
 </nav>
