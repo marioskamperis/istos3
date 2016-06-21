@@ -55,7 +55,7 @@ if (isset($_SESSION['questions']) && ! empty($_SESSION['questions'])) {
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Title</title>
+	<title>AsoeeMDB</title>
 
 	<!--	<link rel="stylesheet" type="text/css" href="css/index.css">-->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"

@@ -9,14 +9,23 @@
 
 
 
+-- DROP USER 'marios_kamperis'@'localhost';
+-- DROP DATABASE istos3;
 
 CREATE DATABASE istos3;
 
+USE istos3;
+
 CREATE USER 'marios_kamperis'@'localhost' IDENTIFIED BY '3110068';
+
+
+#GRANT ALL PRIVILEGES ON istos3.* TO marios_kamperis@localhost WITH GRANT OPTION;
 
 GRANT ALL PRIVILEGES ON istos3.* TO 'marios_kamperis'@'localhost';
 
-USE istos3;
+FLUSH PRIVILEGES;
+
+-- SELECT * FROM mysql.user;
 
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";

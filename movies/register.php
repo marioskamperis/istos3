@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>Texnoligies Kai Programatismos</title>
+	<title>AsoeeMDB</title>
 	<link rel="stylesheet" href="css/register.css">
 </head>
 

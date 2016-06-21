@@ -57,7 +57,7 @@ if (isset($_GET['movie_id']) && ! empty($_GET['movie_id'])) {
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Title</title>
+	<title>AsoeeMDB</title>
 
 
 	<link rel="stylesheet" type="text/css" href="css/movie.css">
